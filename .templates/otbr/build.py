@@ -140,23 +140,25 @@ def main():
   # #####################################
 
   def checkForIssues():
-    with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objHardwareListFile:
-      otbrYamlBuildOptions = yaml.load(objHardwareListFile)
+    passed = True
+    try:
+      with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objHardwareListFile:
+        otbrYamlBuildOptions = yaml.load(objHardwareListFile)
+      if not otbrYamlBuildOptions["hardware"] or len(otbrYamlBuildOptions["hardware"]) < 1:
+        issues["hardware"] = "No Thread radio selected."
+        passed = False
+      if otbrYamlBuildOptions["hardware"] and len(otbrYamlBuildOptions["hardware"]) > 1:
+        issues["hardware"] = "Two or more thread radios selected. The first listed one will be used"
+        passed = False
+    except Exception as err:
+      issues["hardware"] = "No Thread radio selected."
     for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
         portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeServicesYaml)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
-
-    print(otbrYamlBuildOptions["hardware"])
-    if not otbrYamlBuildOptions["hardware"] or len(otbrYamlBuildOptions["hardware"]) < 1:
-      issues["hardware"] = "No Thread radio selected."
-    if otbrYamlBuildOptions["hardware"] and len(otbrYamlBuildOptions["hardware"]) > 1:
-      issues["hardware"] = "Two or more thread radios selected. The first listed one will be used"
-
-
-
+          passed = False
 
   # #####################################
   # End Supporting functions

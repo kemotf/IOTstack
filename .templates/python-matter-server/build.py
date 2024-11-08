@@ -97,39 +97,63 @@ def main():
   def preBuild():
     global dockerComposeServicesYaml
     global currentServiceName
-    with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objExtrasListFile:
-      pythonMatterServerYamlBuildOptions = yaml.load(objExtrasListFile)
-
-    with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
-      serviceYamlTemplate = yaml.load(objServiceFile)
-
-    oldBuildCache = {}
     try:
-      with open(r'%s' % buildCache) as objBuildCache:
-        oldBuildCache = yaml.load(objBuildCache)
-    except:
-      pass
+      with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objExtrasListFile:
+        pythonMatterServerYamlBuildOptions = yaml.load(objExtrasListFile)
 
+      with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
+        serviceYamlTemplate = yaml.load(objServiceFile)
+
+      oldBuildCache = {}
+      try:
+        with open(r'%s' % buildCache) as objBuildCache:
+          oldBuildCache = yaml.load(objBuildCache)
+      except:
+        pass
       
-    buildCacheServices = {}
-    if "services" in oldBuildCache:
-      buildCacheServices = oldBuildCache["services"]
+      buildCacheServices = {}
+      if "services" in oldBuildCache:
+        buildCacheServices = oldBuildCache["services"]
 
-    if not os.path.exists(serviceService):
-      os.makedirs(serviceService, exist_ok=True)
+      if not os.path.exists(serviceService):
+        os.makedirs(serviceService, exist_ok=True)
 
-    try:
-      if currentServiceName in dockerComposeServicesYaml:
-        if pythonMatterServerYamlBuildOptions["extras"]:
-          if "Mount Bluetooth: /run/dbus" in pythonMatterServerYamlBuildOptions["extras"]:
-            if not "/run/dbus:/run/dbus:ro" in dockerComposeServicesYaml[currentServiceName]["volumes"]:
-              dockerComposeServicesYaml[currentServiceName]["volumes"].append("/run/dbus:/run/dbus:ro")
+      try:
+        if currentServiceName in dockerComposeServicesYaml:
+          if pythonMatterServerYamlBuildOptions["extras"]:
+            if "Mount Bluetooth: /run/dbus" in pythonMatterServerYamlBuildOptions["extras"]:
+              if not "/run/dbus:/run/dbus:ro" in dockerComposeServicesYaml[currentServiceName]["volumes"]:
+                dockerComposeServicesYaml[currentServiceName]["volumes"].append("/run/dbus:/run/dbus:ro")
 
-            currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
-            if not "--bluetooth-adapter 0\n" in currentCommand:
-              newCommand = currentCommand + "--bluetooth-adapter 0\n"
-              dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
+              currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
+              if not "--bluetooth-adapter 0\n" in currentCommand:
+                newCommand = currentCommand + "--bluetooth-adapter 0\n"
+                dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
+            else:
+              if "/run/dbus:/run/dbus:ro" in dockerComposeServicesYaml[currentServiceName]["volumes"]:
+                  dockerComposeServicesYaml[currentServiceName]["volumes"].remove("/run/dbus:/run/dbus:ro")
+
+              currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
+              if "--bluetooth-adapter 0\n" in currentCommand:
+                  newCommand = currentCommand.replace("--bluetooth-adapter 0\n", "")
+                  dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
+
+            if "Enabled Root Certificates" in pythonMatterServerYamlBuildOptions["extras"]:
+              currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
+              if not "--paa-root-cert-dir /data/credentials\n" in currentCommand:
+                newCommand = currentCommand + "--paa-root-cert-dir /data/credentials\n"
+                dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
+            else:
+              currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
+              if "--paa-root-cert-dir /data/credentials\n" in currentCommand:
+                  newCommand = currentCommand.replace("--paa-root-cert-dir /data/credentials\n", "")
+                  dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
           else:
+            currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
+            if "--paa-root-cert-dir /data/credentials\n" in currentCommand:
+                newCommand = currentCommand.replace("--paa-root-cert-dir /data/credentials\n", "")
+                dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
+
             if "/run/dbus:/run/dbus:ro" in dockerComposeServicesYaml[currentServiceName]["volumes"]:
                 dockerComposeServicesYaml[currentServiceName]["volumes"].remove("/run/dbus:/run/dbus:ro")
 
@@ -138,35 +162,12 @@ def main():
                 newCommand = currentCommand.replace("--bluetooth-adapter 0\n", "")
                 dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
 
-          if "Enabled Root Certificates" in pythonMatterServerYamlBuildOptions["extras"]:
-            currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
-            if not "--paa-root-cert-dir /data/credentials\n" in currentCommand:
-              newCommand = currentCommand + "--paa-root-cert-dir /data/credentials\n"
-              dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
-          else:
-            currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
-            if "--paa-root-cert-dir /data/credentials\n" in currentCommand:
-                newCommand = currentCommand.replace("--paa-root-cert-dir /data/credentials\n", "")
-                dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
-        else:
-          currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
-          if "--paa-root-cert-dir /data/credentials\n" in currentCommand:
-              newCommand = currentCommand.replace("--paa-root-cert-dir /data/credentials\n", "")
-              dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
-
-          if "/run/dbus:/run/dbus:ro" in dockerComposeServicesYaml[currentServiceName]["volumes"]:
-              dockerComposeServicesYaml[currentServiceName]["volumes"].remove("/run/dbus:/run/dbus:ro")
-
-          currentCommand = dockerComposeServicesYaml[currentServiceName]["command"]
-          if "--bluetooth-adapter 0\n" in currentCommand:
-              newCommand = currentCommand.replace("--bluetooth-adapter 0\n", "")
-              dockerComposeServicesYaml[currentServiceName]["command"] = newCommand
-
-
-    except Exception as err:
-      print("Error setting pythonMatterServer extras: ", err)
-      time.sleep(10)
-      return False
+      except Exception as err:
+        print("Error setting pythonMatterServer extras: ", err)
+        time.sleep(10)
+        return False
+    except:
+      pass
 
 
 
