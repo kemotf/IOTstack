@@ -7,9 +7,9 @@ python-matter-server:
     - apparmor=unconfined
   volumes:
     - ./volumes/python-matter-server/data:/data
-  ports: # For reference only. Matter requires these ports.
-    - "5580:5580"
-    - "5080:5080"
+  # ports: # For reference only. Matter requires these ports.
+  #   - "5580:5580"
+  #   - "5080:5080"
   command: >
     --storage-path /data
 
