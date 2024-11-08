@@ -16,8 +16,8 @@ otbr:
     - otbr-data:/var/lib/otbr
     - otbr-wpantund:/etc/wpantund.conf
     - otbr-config:/etc/otbr
-  ports: # For reference only. Thread requires these ports.
-    - "8283:8283"
+  ports:
+    - "80:8283"
   command: >
     --radio-url spinel+hdlc+uart:///dev/ttyX # Example
 
