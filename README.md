@@ -42,7 +42,7 @@ See [Getting Started](https://sensorsiot.github.io/IOTstack/Getting-Started) in 
 * How to migrate from the older gcgarner/IOTstack repository.
 * Running the menu to install Docker and set up your containers.
 * Useful Docker commands (start \& stop the stack, manage containers).
-* Stack maintenance.
+* Stack maintenance. 
 
 ### reporting issues
 
