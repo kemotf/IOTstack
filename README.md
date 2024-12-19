@@ -27,7 +27,7 @@ Andreas Spiess:
 * 2019-10-27 #295 Raspberry Pi Server based on Docker, with VPN, Dropbox backup, Influx, Grafana, etc: IOTstack
 
 	[![#295](http://img.youtube.com/vi/a6mjt8tWUws/0.jpg)](https://www.youtube.com/watch?v=a6mjt8tWUws)
-
+ 
 OneMarcFifty:
 
 * 2021-02-02 Raspberry Pi 4 Home Automation Server with IOTstack
