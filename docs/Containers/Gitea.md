@@ -58,16 +58,18 @@ Environment variables need to be set in several stages:
 
 	If this is the first time you have launched Gitea, docker compose will also build and run the `gitea_db` service.
 
-	You can expect to see the following warning:
+	You can expect to see the following warnings:
 
 	```
-	WARN[0000] The "GITEA_SECRET_KEY" variable is not set. Defaulting to a blank string.
+	WARN[0000] The "GITEA_SECRET_KEY" variable is not set. Defaulting to a blank string. 
+	WARN[0000] The "GITEA_INTERNAL_TOKEN" variable is not set. Defaulting to a blank string. 
 	```
 
-	This is actually a reminder to execute this command:
+	Those are reminders to execute these commands:
 
 	``` console
 	$ echo "GITEA_SECRET_KEY=$(docker exec gitea gitea generate secret SECRET_KEY)" >>~/IOTstack/.env
+	$ echo "GITEA_INTERNAL_TOKEN=$(docker exec gitea gitea generate secret INTERNAL_TOKEN)" >>~/IOTstack/.env
 	```
 
 	After that command has run, start the container again:
@@ -113,9 +115,9 @@ Environment variables need to be set in several stages:
 		``` console
 		$ docker exec gitea gitea cert --host «hostname»
 		```
-		
+
 		where `«hostname»` should be the first part of the fully-qualified domain name that the **user** uses to reach the Gitea service. Examples:
-		
+
 		* `gitea.my.domain.com` = `gitea`
 		* `host.my.domain.com` = `host`
 
@@ -127,26 +129,26 @@ Environment variables need to be set in several stages:
 		# - GITEA__server__KEY_FILE=/data/git/key.pem
 		# - GITEA__server__CERT_FILE=/data/git/cert.pem
 		```
-		
+
 		These variables tell Gitea where to find the X.509 certificate and matching private key that were generated in the first step.
-		
+
 	- Tell Gitea to enable HTTPS:
 
 		``` console
 		$ echo "GITEA_WEB_PROTOCOL=https" >>~/IOTstack/.env
 		```
-		
+
 	- Recreate the container:
 
 		``` console
 		$ cd ~/IOTstack
 		$ docker compose up -d gitea
 		```
-		
+
 	If everything has gone according to plan, Gitea will be expecting HTTPS traffic and will perform SSL authentication using the key and certificate generated in the first step.
-	
+
 	Notes:
-	
+
 	* The certificate has a one-year lifetime. It can be regenerated at any time by re-running the command provided earlier.
 	* Gitea also supports LetsEncrypt. See [using ACME with Let's Encrypt](https://docs.gitea.com/administration/https-setup#using-acme-default-lets-encrypt).
 
@@ -198,7 +200,7 @@ Use your browser to connect to the Gitea service, either:
 	https://gitea.my.domain.com
 	```
 
-	This assumes that the reverse proxy redirects the *indirect* form (using HTTPS) to one of the *direct* forms (using HTTP).
+	This assumes that the reverse proxy redirects the *indirect* form (using HTTPS) to one of the *direct* forms (using either HTTP or HTTPS).
 
 Click on the <kbd>Register</kbd> button to create an account for yourself.
 
