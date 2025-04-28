@@ -224,21 +224,7 @@ Proceed as follows:
 $ cd ~/IOTstack
 $ docker compose down gitea gitea_db
 $ sudo rm -rf ./volumes/gitea
-$ docker compose up -d
-```
-
-In this situation, you should also regenerate the secret key:
-
-``` console
-$ echo "$(docker exec gitea gitea generate secret SECRET_KEY)"
-```
-
-> The reason for wrapping the command in an `echo` is because the `generate` command does not terminate the line so the value of the key has a tendency to run into the next Linux prompt.
-
-Copy the value that is returned to the clipboard, then edit `~/IOTstack.env` to replace the right hand side of `GITEA_SECRET_KEY` with whatever is on the clipboard. Save your work then start the container again:
-
-``` console
-$ docker compose up -d
+$ docker compose up -d gitea
 ```
 
 ## container maintenance
