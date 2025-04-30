@@ -113,13 +113,8 @@ Environment variables need to be set in several stages:
 	- Generate a self-signed certificate:
 
 		``` console
-		$ docker exec gitea gitea cert --host «hostname»
+		$ docker exec gitea bash -c 'cd /data/git ; gitea cert --host gitea'
 		```
-
-		where `«hostname»` should be the first part of the fully-qualified domain name that the **user** uses to reach the Gitea service. Examples:
-
-		* `gitea.my.domain.com` = `gitea`
-		* `host.my.domain.com` = `host`
 
 	- Uncomment the following environment variables in the service definition:
 
@@ -131,6 +126,22 @@ Environment variables need to be set in several stages:
 		```
 
 		These variables tell Gitea where to find the X.509 certificate and matching private key that were generated in the first step.
+
+	- swap the comments on the `test` lines in the `healthcheck` clause:
+
+		``` yaml
+		healthcheck:
+		  test: ["CMD", "curl", "-sf4", "-o", "/dev/null", "http://gitea:3000"]
+		# test: ["CMD", "curl", "-sf4", "--cacert", "/data/git/cert.pem", "-o", "/dev/null", "https://gitea:3000"]
+		```
+
+		In other words, the final result should look like this:
+
+		``` yaml
+		healthcheck:
+		# test: ["CMD", "curl", "-sf4", "-o", "/dev/null", "http://gitea:3000"]
+		  test: ["CMD", "curl", "-sf4", "--cacert", "/data/git/cert.pem", "-o", "/dev/null", "https://gitea:3000"]
+		```
 
 	- Tell Gitea to enable HTTPS:
 
@@ -149,7 +160,14 @@ Environment variables need to be set in several stages:
 
 	Notes:
 
-	* The certificate has a one-year lifetime. It can be regenerated at any time by re-running the command provided earlier.
+	* The certificate has a one-year lifetime. It can be regenerated at any time by re-running the command provided earlier. You could, for example, embed it in a `cron` job, like this:
+
+		``` crontab
+		5    0     1    1,7  *   docker exec gitea bash -c 'cd /data/git ; gitea cert --host gitea' >/dev/null 2>&1
+		```
+
+		In words, run the command "at five minutes after midnight on the first of January and the first of July".
+
 	* Gitea also supports LetsEncrypt. See [using ACME with Let's Encrypt](https://docs.gitea.com/administration/https-setup#using-acme-default-lets-encrypt).
 
 ## database root password  { #rootpw }
