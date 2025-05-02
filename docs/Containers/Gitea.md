@@ -85,13 +85,13 @@ Environment variables need to be set in several stages:
 3. The `GITEA_ROOT_URL` environment variable should be set to the URL that the **user** uses to reach the Gitea service. If you use a proxy host such as Nginx then this would be the URL you present to the proxy. For example:
 
 	``` console
-	$ echo "GITEA_ROOT_URL=https://gitea.my.domain.com >>~/IOTstack.env
+	$ echo "GITEA_ROOT_URL=https://gitea.my.domain.com" >>~/IOTstack.env
 	```
 
 	Alternatively, if you connect directly to the host on which the service is running, the URL will be that of the host plus the external port of the Gitea container. For example:
 
 	``` console
-	$ echo "GITEA_ROOT_URL=http://host.my.domain.com:7920 >>~/IOTstack.env
+	$ echo "GITEA_ROOT_URL=http://host.my.domain.com:7920" >>~/IOTstack.env
 	```
 
 	If omitted, defaults to null in which case the container will make a best-efforts determination (which is unlikely to be correct). You will also see this warning:
