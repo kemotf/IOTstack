@@ -113,7 +113,7 @@ Environment variables need to be set in several stages:
 	- Generate a self-signed certificate:
 
 		``` console
-		$ docker exec gitea bash -c 'cd /data/git ; gitea cert --host gitea'
+		$ docker exec gitea bash -c 'cd /data/git ; gitea cert --host gitea --ca'
 		```
 
 	- Uncomment the following environment variables in the service definition:
@@ -163,7 +163,7 @@ Environment variables need to be set in several stages:
 	* The certificate has a one-year lifetime. It can be regenerated at any time by re-running the command provided earlier. You could, for example, embed it in a `cron` job, like this:
 
 		``` crontab
-		5  0  1  1,7  *  docker exec gitea bash -c 'cd /data/git ; gitea cert --host gitea' >/dev/null 2>&1
+		5  0  1  1,7  *  docker exec gitea bash -c 'cd /data/git ; gitea cert --host gitea --ca' >/dev/null 2>&1
 		```
 
 		In words, run the command "at five minutes after midnight on the first of January and the first of July".
